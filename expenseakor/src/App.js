@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import './App.css';
 import Login from './components/Login';
 import { db } from './firebase'; // Importar la configuración de Firebase
@@ -23,16 +23,16 @@ const App = () => {
     return `${formattedInteger},${decimalPart}`;
   };
 
-  const initializeCounter = async () => {
+  const initializeCounter = useCallback(async () => {
     const counterDocRef = doc(db, "counters", "transactionCounter");
     const counterDoc = await getDoc(counterDocRef);
 
     if (!counterDoc.exists()) {
       await setDoc(counterDocRef, { lastId: 0 }); // Inicializar con 0
     }
-  };
+  }, []);
 
-  const getNextId = async () => {
+  const getNextId = useCallback(async () => {
     const counterDocRef = doc(db, "counters", "transactionCounter");
     const counterDoc = await getDoc(counterDocRef);
     
@@ -46,10 +46,18 @@ const App = () => {
     } else {
       throw new Error("Counter document not found");
     }
-  };
+  }, []);
+
+  // Actualizar el balance
+  const updateBalance = useCallback((transactions) => {
+    const total = transactions.reduce((acc, transaction) => {
+      return transaction.type === 'expense' ? acc - transaction.amount : acc + transaction.amount;
+    }, 0);
+    setBalance(total);
+  }, []);
 
   // Obtener datos de Firestore
-  const fetchTransactions = async () => {
+  const fetchTransactions = useCallback(async () => {
     const querySnapshot = await getDocs(collection(db, "transactions"));
     const fetchedTransactions = [];
     querySnapshot.forEach((doc) => {
@@ -59,25 +67,17 @@ const App = () => {
     fetchedTransactions.sort((a, b) => a.id - b.id);
     setTransactions(fetchedTransactions);
     updateBalance(fetchedTransactions);
-  };
-
-  // Actualizar el balance
-  const updateBalance = (transactions) => {
-    const total = transactions.reduce((acc, transaction) => {
-      return transaction.type === 'expense' ? acc - transaction.amount : acc + transaction.amount;
-    }, 0);
-    setBalance(total);
-  };
+  }, [updateBalance]);
 
   useEffect(() => {
     const init = async () => {
       if (isLoggedIn) {
-        await initializeCounter(); // Inicializar el contador al iniciar sesión
+        await initializeCounter();
         fetchTransactions();
       }
     };
     init();
-  }, [isLoggedIn][fetchTransactions]);
+  }, [isLoggedIn, initializeCounter, fetchTransactions]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
