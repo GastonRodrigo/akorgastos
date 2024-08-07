@@ -77,7 +77,7 @@ const App = () => {
       }
     };
     init();
-  }, [isLoggedIn]);
+  }, [isLoggedIn][fetchTransactions]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
