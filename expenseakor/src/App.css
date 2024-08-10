@@ -1,33 +1,37 @@
+/* Estilos Generales */
 .App {
-  font-family: Arial, sans-serif;
+  font-family: 'Poppins', Arial, sans-serif;
   text-align: center;
   padding: 20px;
-  background-color: #f7f7f7;
+  background: linear-gradient(135deg, #f0f0f0, #d7e1ec);
   color: #333;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 }
 
 form div {
-  margin: 10px 0;
+  margin: 15px 0;
 }
 
 input, select, button {
-  padding: 8px;
-  margin: 5px;
-  border-radius: 5px;
+  padding: 10px;
+  margin: 8px;
+  border-radius: 8px;
   border: 1px solid #ccc;
   font-size: 16px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  width: 100%;
+  max-width: 300px;
 }
 
-/* Estilo para eliminar las flechas en campos de número */
-input[type=number]::-webkit-inner-spin-button,
-input[type=number]::-webkit-outer-spin-button {
-  -webkit-appearance: none;
-  margin: 0;
-}
-
-input[type=number] {
-  -moz-appearance: textfield;
-  appearance: textfield;
+input:focus, select:focus, button:focus {
+  outline: none;
+  border-color: #00bfff;
+  box-shadow: 0 0 10px rgba(0, 191, 255, 0.5);
 }
 
 button {
@@ -35,29 +39,32 @@ button {
   color: white;
   border: none;
   cursor: pointer;
-  transition: background-color 0.3s ease, transform 0.2s ease;
+  transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 button:hover {
   background-color: #00bfff;
-  transform: scale(1.05);
-}
-
-.animated-button:active {
-  transform: scale(0.95);
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: 0 5px 15px rgba(0, 191, 255, 0.3);
 }
 
 table {
-  width: 80%;
-  margin: 20px auto;
+  width: 100%; 
+  margin: 20px 0;
   border-collapse: collapse;
   background-color: #fff;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+  overflow: hidden;
+  animation: fadeInUp 0.5s ease;
+  text-align: center; /* Centra todo el texto en la tabla */
 }
 
 th, td {
-  padding: 10px;
-  border: 1px solid #ddd;
-  text-align: left;
+  padding: 15px;
+  border-bottom: 1px solid #ddd;
+  transition: background-color 0.3s ease;
+  vertical-align: middle; /* Centra verticalmente */
 }
 
 th {
@@ -75,10 +82,12 @@ tbody tr:hover {
 
 .expense-amount {
   color: red;
+  font-weight: bold;
 }
 
 .income-amount {
   color: green;
+  font-weight: bold;
 }
 
 .clear-modal {
@@ -87,8 +96,105 @@ tbody tr:hover {
   left: 50%;
   transform: translate(-50%, -50%);
   background-color: white;
-  padding: 20px;
-  border-radius: 8px;
-  box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
+  padding: 25px;
+  border-radius: 12px;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.4);
   z-index: 1000;
+  animation: scaleUp 0.3s ease;
+}
+
+/* Animations */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes scaleUp {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Estilos Responsivos */
+@media (max-width: 768px) {
+  .App {
+    padding: 10px;
+  }
+
+  input, select, button {
+    width: 90%;
+    max-width: none;
+    margin: 5px auto;
+  }
+
+  table {
+    width: 100%;
+    font-size: 14px;
+  }
+
+  th, td {
+    padding: 10px;
+  }
+}
+
+@media (max-width: 480px) {
+  table {
+    width: 100%;
+  }
+
+  tbody tr {
+    display: block;
+    width: 100%;
+    margin-bottom: 10px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 5px 5px rgba(0, 0, 0, 0.1);
+    text-align: center; /* Centra el contenido de cada fila */
+  }
+
+  tbody tr td {
+    display: block;
+    text-align: center;
+    padding: 10px;
+    box-sizing: border-box;
+    width: 100%;
+    vertical-align: middle; /* Asegura que el texto esté centrado verticalmente */
+  }
+
+  tbody tr td:before {
+    content: attr(data-label);
+    display: block;
+    font-weight: bold;
+    margin-bottom: 0px;
+    text-align: left;
+  }
+
+  th {
+    display: none; 
+  }
+
+  tbody tr {
+    display: block;
+    text-align: center; 
+  }
+
+  tbody tr td {
+    padding: 10px 1;
+    border-bottom: 2px solid #afafaf;
+  }
+
+  tbody tr td:last-child {
+    border-bottom: none;
+  }
 }

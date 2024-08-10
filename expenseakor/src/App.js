@@ -9,6 +9,7 @@ const App = () => {
   const [amount, setAmount] = useState('');
   const [type, setType] = useState('expense');
   const [category, setCategory] = useState('');
+  const [comment, setComment] = useState(''); // Nuevo estado para el comentario
   const [balance, setBalance] = useState(0);
   const [transactions, setTransactions] = useState([]);
 
@@ -48,7 +49,6 @@ const App = () => {
     }
   }, []);
 
-  // Actualizar el balance
   const updateBalance = useCallback((transactions) => {
     const total = transactions.reduce((acc, transaction) => {
       return transaction.type === 'expense' ? acc - transaction.amount : acc + transaction.amount;
@@ -56,7 +56,6 @@ const App = () => {
     setBalance(total);
   }, []);
 
-  // Obtener datos de Firestore
   const fetchTransactions = useCallback(async () => {
     const querySnapshot = await getDocs(collection(db, "transactions"));
     const fetchedTransactions = [];
@@ -91,6 +90,7 @@ const App = () => {
           type,
           amount: numericAmount,
           category: type === 'expense' ? category : 'Entrada',
+          comment, // Agregar el comentario
           date: new Date().toLocaleString()
         };
 
@@ -105,8 +105,10 @@ const App = () => {
 
         updateBalance([...transactions, newTransaction]);
 
+        // Limpiar los campos después de agregar la transacción
         setAmount('');
         setCategory('');
+        setComment(''); // Limpiar el comentario
       } catch (error) {
         console.error("Error al agregar la transacción:", error);
         alert('Hubo un error al agregar la transacción. Intenta de nuevo.');
@@ -150,6 +152,15 @@ const App = () => {
             </select>
           </div>
         )}
+        <div>
+          <label>Comentario (opcional):</label>
+          <input
+            type="text"
+            value={comment}
+            onChange={(e) => setComment(e.target.value)}
+            placeholder="Agrega un comentario..."
+          />
+        </div>
         <button type="submit" className="animated-button">Agregar</button>
       </form>
       <h2>Balance: ${formatAmount(balance)}</h2>
@@ -160,22 +171,25 @@ const App = () => {
             <th>Fecha</th>
             <th>Tipo</th>
             <th>Categoría</th>
+            <th>Comentario</th>
             <th>Monto</th>
           </tr>
         </thead>
         <tbody>
-          {transactions.map((transaction) => (
-            <tr key={transaction.id}>
-              <td>{transaction.id}</td>
-              <td>{transaction.date}</td>
-              <td>{transaction.type === 'expense' ? 'Gasto' : 'Entrada'}</td>
-              <td>{transaction.category}</td>
-              <td className={transaction.type === 'expense' ? 'expense-amount' : 'income-amount'}>
-                {transaction.type === 'expense' ? `-$${formatAmount(transaction.amount)}` : `$${formatAmount(transaction.amount)}`}
-              </td>
-            </tr>
-          ))}
-        </tbody>
+  {transactions.map((transaction) => (
+    <tr key={transaction.id}>
+      <td data-label="ID">{transaction.id}</td>
+      <td data-label="Fecha">{transaction.date}</td>
+      <td data-label="Tipo">{transaction.type === 'expense' ? 'Gasto' : 'Entrada'}</td>
+      <td data-label="Categoría">{transaction.category}</td>
+      <td data-label="Comentario">{transaction.comment || '---'}</td> {/* Mostrar '---' si no hay comentario */}
+      <td data-label="Monto" className={transaction.type === 'expense' ? 'expense-amount' : 'income-amount'}>
+        {transaction.type === 'expense' ? `-$${formatAmount(transaction.amount)}` : `$${formatAmount(transaction.amount)}`}
+      </td>
+    </tr>
+  ))}
+</tbody>
+
       </table>
     </div>
   );
