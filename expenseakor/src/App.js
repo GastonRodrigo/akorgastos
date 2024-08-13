@@ -9,9 +9,10 @@ const App = () => {
   const [amount, setAmount] = useState('');
   const [type, setType] = useState('expense');
   const [category, setCategory] = useState('');
-  const [comment, setComment] = useState(''); // Nuevo estado para el comentario
+  const [comment, setComment] = useState('');
   const [balance, setBalance] = useState(0);
   const [transactions, setTransactions] = useState([]);
+  const [notification, setNotification] = useState(null); // New state for notification
 
   const categories = [
     'Impuestos', 'Jose', 'Laureno', 'Manuel', 'Santiago', 'Aramis', 
@@ -90,7 +91,7 @@ const App = () => {
           type,
           amount: numericAmount,
           category: type === 'expense' ? category : 'Entrada',
-          comment, // Agregar el comentario
+          comment,
           date: new Date().toLocaleString()
         };
 
@@ -105,13 +106,20 @@ const App = () => {
 
         updateBalance([...transactions, newTransaction]);
 
+        // Set notification
+        setNotification(`${type === 'expense' ? 'Gasto' : 'Entrada'} agregado correctamente`);
+        
+        // Clear notification after 3 seconds
+        setTimeout(() => setNotification(null), 3000);
+
         // Limpiar los campos después de agregar la transacción
         setAmount('');
         setCategory('');
-        setComment(''); // Limpiar el comentario
+        setComment('');
       } catch (error) {
         console.error("Error al agregar la transacción:", error);
-        alert('Hubo un error al agregar la transacción. Intenta de nuevo.');
+        setNotification('Hubo un error al agregar la transacción. Intenta de nuevo.');
+        setTimeout(() => setNotification(null), 3000);
       }
     }
   };
@@ -123,6 +131,7 @@ const App = () => {
   return (
     <div className="App">
       <h1>Gestor de Gastos</h1>
+      {notification && <div className="notification">{notification}</div>}
       <form onSubmit={handleSubmit}>
         <div>
           <label>Monto:</label>
@@ -131,7 +140,7 @@ const App = () => {
             value={amount}
             onChange={(e) => setAmount(e.target.value)}
             required
-            style={{ appearance: 'none' }} // Eliminar flechas
+            style={{ appearance: 'none' }}
           />
         </div>
         <div>
@@ -176,20 +185,19 @@ const App = () => {
           </tr>
         </thead>
         <tbody>
-  {transactions.map((transaction) => (
-    <tr key={transaction.id}>
-      <td data-label="ID">{transaction.id}</td>
-      <td data-label="Fecha">{transaction.date}</td>
-      <td data-label="Tipo">{transaction.type === 'expense' ? 'Gasto' : 'Entrada'}</td>
-      <td data-label="Categoría">{transaction.category}</td>
-      <td data-label="Comentario">{transaction.comment || '---'}</td> {/* Mostrar '---' si no hay comentario */}
-      <td data-label="Monto" className={transaction.type === 'expense' ? 'expense-amount' : 'income-amount'}>
-        {transaction.type === 'expense' ? `-$${formatAmount(transaction.amount)}` : `$${formatAmount(transaction.amount)}`}
-      </td>
-    </tr>
-  ))}
-</tbody>
-
+          {transactions.map((transaction) => (
+            <tr key={transaction.id}>
+              <td data-label="ID">{transaction.id}</td>
+              <td data-label="Fecha">{transaction.date}</td>
+              <td data-label="Tipo">{transaction.type === 'expense' ? 'Gasto' : 'Entrada'}</td>
+              <td data-label="Categoría">{transaction.category}</td>
+              <td data-label="Comentario">{transaction.comment || '---'}</td>
+              <td data-label="Monto" className={transaction.type === 'expense' ? 'expense-amount' : 'income-amount'}>
+                {transaction.type === 'expense' ? `-$${formatAmount(transaction.amount)}` : `$${formatAmount(transaction.amount)}`}
+              </td>
+            </tr>
+          ))}
+        </tbody>
       </table>
     </div>
   );
